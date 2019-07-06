@@ -9,24 +9,26 @@
 import UIKit
 
 class ViewController: UIViewController {
-    
+
+    var viewCells = [String: UIView]()
+    let numberOfCellsPerRow = 15
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        let numberOfCellsPerRow = 15
-        let cellWidth = self.view.frame.width / CGFloat(numberOfCellsPerRow)
-        let cellHeight = cellWidth
-        let numberOfCellsPerColumn = Int(self.view.frame.height / cellHeight)
+        let cellSize = self.view.frame.width / CGFloat(numberOfCellsPerRow)
+        let numberOfCellsPerColumn = Int(self.view.frame.height / cellSize)
 
         for j in 0...numberOfCellsPerColumn {
             for i in 0...numberOfCellsPerRow - 1{
                 let cell = UIView()
                 cell.layer.borderWidth = 0.5
                 cell.layer.borderColor = UIColor.black.cgColor
-                cell.frame = CGRect(x: CGFloat(i) * cellWidth, y: CGFloat(j) * cellHeight, width: cellWidth, height: cellHeight)
+                cell.frame = CGRect(x: CGFloat(i) * cellSize, y: CGFloat(j) * cellSize, width: cellSize, height: cellSize)
                 cell.backgroundColor = randomColor()
                 view.addSubview(cell)
+                let key = "\(i)|\(j)"
+                viewCells[key] = cell
             }
         }
         
@@ -34,7 +36,15 @@ class ViewController: UIViewController {
     }
 
     @objc func handlePan(gesture: UIPanGestureRecognizer){
-        print(gesture.location(in: self.view))
+        let cellSize = self.view.frame.width / CGFloat(numberOfCellsPerRow)
+        let location = gesture.location(in: self.view)
+        let i = Int(location.x / cellSize)
+        let j = Int(location.y / cellSize)
+        let locationKey = "\(i)|\(j)"
+        let view = viewCells[locationKey]
+        print(locationKey)
+        view?.backgroundColor = UIColor.black
+        
     }
     
     func randomColor()-> UIColor {
