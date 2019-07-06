@@ -35,16 +35,39 @@ class ViewController: UIViewController {
         view.addGestureRecognizer(UIPanGestureRecognizer(target: self, action: #selector(handlePan)))
     }
 
+    var currentCell: UIView?
+    
     @objc func handlePan(gesture: UIPanGestureRecognizer){
         let cellSize = self.view.frame.width / CGFloat(numberOfCellsPerRow)
         let location = gesture.location(in: self.view)
         let i = Int(location.x / cellSize)
         let j = Int(location.y / cellSize)
         let locationKey = "\(i)|\(j)"
-        let view = viewCells[locationKey]
-        print(locationKey)
-        view?.backgroundColor = UIColor.black
-        
+//        guard let lastCell = self.currentCell else {return}
+        guard let selectedCell = viewCells[locationKey] else {return}
+        if currentCell != nil {
+            if currentCell != selectedCell {
+                shrnkCell(v: currentCell!)
+            }
+        }
+        scaleCell(v: selectedCell)
+        currentCell = selectedCell
+        if gesture.state == UIGestureRecognizer.State.ended {
+            shrnkCell(v: selectedCell)
+        }
+    }
+    
+    private func scaleCell(v: UIView){
+        self.view.bringSubviewToFront(v)
+        UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 1, options: .curveEaseOut, animations: {
+            v.layer.transform = CATransform3DMakeScale(3, 3, 3)
+        }, completion: nil)
+    }
+    
+    private func shrnkCell(v: UIView){
+        UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 1, options: .curveEaseOut, animations: {
+            v.layer.transform = CATransform3DIdentity
+        }, completion: nil)
     }
     
     func randomColor()-> UIColor {
